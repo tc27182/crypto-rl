@@ -26,8 +26,8 @@ parser.add_argument('--symbol',
                     help="Name of currency pair or instrument",
                     type=str)
 parser.add_argument('--id',
-                    # default='market-maker-v0',
-                    default='trend-following-v0',
+                    default='market-maker-v0',
+                    # default='trend-following-v0',
                     help="Environment ID; Either 'trend-following-v0' or "
                          "'market-maker-v0'",
                     type=str)

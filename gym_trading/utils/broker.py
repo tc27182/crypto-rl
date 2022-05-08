@@ -224,7 +224,6 @@ class Broker(object):
                 # net out the inventory
                 new_position = self.short_inventory.pop_position()
                 pnl += self.long_inventory.remove(netting_order=new_position)
-
         return pnl, is_long_order_filled, is_short_order_filled
 
     def get_short_order_distance_to_midpoint(self, midpoint=100.) -> float:

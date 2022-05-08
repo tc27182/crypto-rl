@@ -20,7 +20,7 @@ class MarketMaker(BaseEnvironment):
         super().__init__(**kwargs)
 
         # Environment attributes to override in sub-class
-        self.actions = np.eye(17, dtype=np.float32)
+        self.actions = np.eye(15, dtype=np.float32)
 
         self.action_space = spaces.Discrete(len(self.actions))
         self.observation = self.reset()  # Reset to load observation.shape
@@ -54,71 +54,20 @@ class MarketMaker(BaseEnvironment):
         if action == 0:  # do nothing
             action_penalty += ENCOURAGEMENT
 
-        elif action == 1:
-            action_penalty += self._create_order_at_level(level=0, side='long')
-            action_penalty += self._create_order_at_level(level=4, side='short')
+        elif action > 0:
+            #action_penalty += self._create_order_at_level(level=0, side='long')
+            action_penalty += self._create_order_at_level(level=action, side='short')
 
-        elif action == 2:
-            action_penalty += self._create_order_at_level(level=0, side='long')
-            action_penalty += self._create_order_at_level(level=9, side='short')
-
-        elif action == 3:
-            action_penalty += self._create_order_at_level(level=0, side='long')
-            action_penalty += self._create_order_at_level(level=14, side='short')
-
-        elif action == 4:
-            action_penalty += self._create_order_at_level(level=4, side='long')
-            action_penalty += self._create_order_at_level(level=0, side='short')
-
-        elif action == 5:
-            action_penalty += self._create_order_at_level(level=4, side='long')
-            action_penalty += self._create_order_at_level(level=4, side='short')
-
-        elif action == 6:
-            action_penalty += self._create_order_at_level(level=4, side='long')
-            action_penalty += self._create_order_at_level(level=9, side='short')
-
-        elif action == 7:
-            action_penalty += self._create_order_at_level(level=4, side='long')
-            action_penalty += self._create_order_at_level(level=14, side='short')
-
-        elif action == 8:
-            action_penalty += self._create_order_at_level(level=9, side='long')
-            action_penalty += self._create_order_at_level(level=0, side='short')
-
-        elif action == 9:
-            action_penalty += self._create_order_at_level(level=9, side='long')
-            action_penalty += self._create_order_at_level(level=4, side='short')
-
-        elif action == 10:
-            action_penalty += self._create_order_at_level(level=9, side='long')
-            action_penalty += self._create_order_at_level(level=9, side='short')
-
-        elif action == 11:
-            action_penalty += self._create_order_at_level(level=9, side='long')
-            action_penalty += self._create_order_at_level(level=14, side='short')
-
-        elif action == 12:
-            action_penalty += self._create_order_at_level(level=14, side='long')
-            action_penalty += self._create_order_at_level(level=0, side='short')
-
-        elif action == 13:
-            action_penalty += self._create_order_at_level(level=14, side='long')
-            action_penalty += self._create_order_at_level(level=4, side='short')
-
-        elif action == 14:
-            action_penalty += self._create_order_at_level(level=14, side='long')
-            action_penalty += self._create_order_at_level(level=9, side='short')
-
-        elif action == 15:
-            action_penalty += self._create_order_at_level(level=14, side='long')
-            action_penalty += self._create_order_at_level(level=14, side='short')
-
-        elif action == 16:
-            pnl += self.broker.flatten_inventory(self.best_bid, self.best_ask)
-
+        #elif action < 0:
+        #    action_penalty += self._create_order_at_level(level=-action, side='long')
+        #    #action_penalty += self._create_order_at_level(level=0, side='short')
         else:
             raise ValueError("L'action n'exist pas !!! Il faut faire attention !!!")
+        
+        ''' don't need this i think, compare to optimized policies
+        elif action == 16:
+            pnl += self.broker.flatten_inventory(self.best_bid, self.best_ask)
+        '''
 
         return action_penalty, pnl
 
