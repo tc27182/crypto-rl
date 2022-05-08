@@ -78,7 +78,7 @@ class BaseEnvironment(Env, ABC):
         # properties required for instantiation
         self.symbol = symbol
         self.action_repeats = action_repeats
-        self._seed = seed
+        self._seed = 0
         self._random_state = np.random.RandomState(seed=self._seed)
         self.training = training
         self.max_position = max_position
@@ -126,7 +126,8 @@ class BaseEnvironment(Env, ABC):
         self._best_bids = self._raw_data['midpoint'] - (self._raw_data['spread'] / 2)
         self._best_asks = self._raw_data['midpoint'] + (self._raw_data['spread'] / 2)
 
-        self.max_steps = self._raw_data.shape[0] - self.action_repeats - 1
+        #self.max_steps = self._raw_data.shape[0] - self.action_repeats - 1
+        self.max_steps = 300
 
         # load indicators into the indicator manager
         self.tns = IndicatorManager()
@@ -368,8 +369,12 @@ class BaseEnvironment(Env, ABC):
         :return: (np.array) Observation at first step
         """
         if self.training:
-            self.local_step_number = self._random_state.randint(low=0,
-                                                                high=self.max_steps // 5)
+            self.local_step_number = self.seed*300
+            if self.seed*300 >= self._raw_data.shape[0] - self.action_repeats - 1:
+                self.seed = -1
+            self.seed += 1
+            #self.local_step_number = self._random_state.randint(low=0,
+            #                                                    high=self.max_steps // 5)
         else:
             self.local_step_number = 0
 

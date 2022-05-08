@@ -5,6 +5,9 @@ from rl.agents.dqn import DQNAgent
 from rl.memory import SequentialMemory
 from rl.callbacks import FileLogger, ModelIntervalCheckpoint
 from configurations import LOGGER
+from gym_trading.envs import MarketMaker
+from gym_trading.utils import LimitOrder
+
 import os
 import gym
 import gym_trading
