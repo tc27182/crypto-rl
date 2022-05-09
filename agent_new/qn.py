@@ -16,7 +16,7 @@ import gym_trading
 class Agent(object):
     name = 'DQN'
 
-    def __init__(self, fitting_file, testing_file, number_of_training_steps=1e5, gamma=0.999, load_weights=False,
+    def __init__(self, fitting_file, testing_file, number_of_training_steps=1e5, num_assets = 10, gamma=0.999, load_weights=False,
                  visualize=False, dueling_network=True, double_dqn=True, nn_type='mlp',
                  **kwargs):
         """
@@ -49,6 +49,7 @@ class Agent(object):
         self.double_dqn = False
         self.fitting_file = fitting_file
         self.testing_file = testing_file
+        self.num_assets = num_assets
 
         # Create environment
         self.env = MarketMaker(symbol="LTC-USD", fitting_file=self.fitting_file, testing_file = self.testing_file)
@@ -139,6 +140,22 @@ class Agent(object):
 
         :return: (void)
         """
+        env.broker.long_inventory.order = LimitOrder(ccy=self.env.symbol,
+                                side='long',
+                                price=self.env.midpoint,
+                                step=self.env.local_step_number,
+                                queue_ahead=0)
+        limit_pnl, long_filled, short_filled = env.broker.step_limit_order_pnl(
+                        bid_price=0, #shouldn't allow any bids to go through, but forces a sale at the midpoint price
+                        ask_price=self.env.midpoint,
+                        buy_volume=0,
+                        sell_volume=self.num_assets,
+                        step=self.env.local_step_number)
+
+        self.env.step()
+        
+        self.env.broker.long_inventory.cancel_limit_order()
+
         output_directory = os.path.join(self.cwd, 'dqn_weights')
         if not os.path.exists(output_directory):
             LOGGER.info('{} does not exist. Creating Directory.'.format(output_directory))

@@ -79,6 +79,7 @@ class BaseEnvironment(Env, ABC):
         self.H = 300
         self.T = 5
         self.count = 0
+        self.num_assets = 10
 
         # properties required for instantiation
         self.symbol = symbol
@@ -356,7 +357,7 @@ class BaseEnvironment(Env, ABC):
         if self.count >= self.H:
         #if self.local_step_number > self.max_steps:
             self.done = True
-            print("DINE")
+
             had_long_positions = 1 if self.broker.long_inventory_count > 0 else 0
             had_short_positions = 1 if self.broker.short_inventory_count > 0 else 0
 
@@ -446,6 +447,24 @@ class BaseEnvironment(Env, ABC):
             self.last_midpoint = self.midpoint
 
         self.observation = self._get_observation()
+
+        env.broker.long_inventory.order = LimitOrder(ccy=self.symbol,
+                                side='long',
+                                price=self.midpoint,
+                                step=self.local_step_number,
+                                queue_ahead=0)
+        limit_pnl, long_filled, short_filled = self.broker.step_limit_order_pnl(
+                        bid_price=0, #shouldn't allow any bids to go through, but forces a sale at the midpoint price
+                        ask_price=self.midpoint,
+                        buy_volume=0,
+                        sell_volume=self.num_assets,
+                        step=self.local_step_number)
+        self.action_repeats = 1
+        self.env.step()
+        self.local_step_number -= 1
+        self.action_repeats = self.H//self.T
+        self.env.broker.long_inventory.cancel_limit_order()
+
 
         return self.observation
 
