@@ -50,6 +50,7 @@ class Agent(object):
         self.fitting_file = fitting_file
         self.testing_file = testing_file
         self.num_assets = num_assets
+        self.nb_test_episodes = 200
 
         # Create environment
         self.env = MarketMaker(symbol="LTC-USD", fitting_file=self.fitting_file, testing_file = self.testing_file)
@@ -140,22 +141,6 @@ class Agent(object):
 
         :return: (void)
         """
-        env.broker.long_inventory.order = LimitOrder(ccy=self.env.symbol,
-                                side='long',
-                                price=self.env.midpoint,
-                                step=self.env.local_step_number,
-                                queue_ahead=0)
-        limit_pnl, long_filled, short_filled = env.broker.step_limit_order_pnl(
-                        bid_price=0, #shouldn't allow any bids to go through, but forces a sale at the midpoint price
-                        ask_price=self.env.midpoint,
-                        buy_volume=0,
-                        sell_volume=self.num_assets,
-                        step=self.env.local_step_number)
-
-        self.env.step()
-        
-        self.env.broker.long_inventory.cancel_limit_order()
-
         output_directory = os.path.join(self.cwd, 'dqn_weights')
         if not os.path.exists(output_directory):
             LOGGER.info('{} does not exist. Creating Directory.'.format(output_directory))
@@ -201,4 +186,5 @@ class Agent(object):
             LOGGER.info("AGENT weights saved.")
         else:
             LOGGER.info('Starting TEST...')
-            self.agent.test(self.env, nb_episodes=1, visualize=self.visualize)
+            x = self.agent.test(self.env, nb_episodes=self.nb_test_episodes, visualize=self.visualize)
+            print(x)

@@ -1,6 +1,7 @@
 from gym_trading.envs import MarketMaker
 from gym_trading.utils import LimitOrder
 from agent_new.qn import Agent
+import numpy as np
 '''
 for day in range (1,32,1):
     print("THE DAY IS NOW" + str(day))
@@ -11,14 +12,17 @@ for day in range (1,32,1):
     fitting_file = "January/January/XBTUSD_2020-01-" + data + ".csv"
     if day != 14:
         agent = Agent(number_of_training_steps = 1000, fitting_file = fitting_file, testing_file = "archive/XBTUSD_2020-02-01.csv.xz", action_repeats = 300)
-        agent.train = False
         agent.start()
 '''
-agent = Agent(number_of_training_steps = 1000, fitting_file = "archive/XBTUSD_2020-02-01.csv.xz", testing_file = "archive/XBTUSD_2020-02-02.csv.xz", action_repeats = 300)
+agent = Agent(visualize=True, number_of_training_steps = 1000, fitting_file = "archive/XBTUSD_2020-02-01.csv.xz", testing_file = "archive/XBTUSD_2020-02-02.csv.xz", action_repeats = 300)
 agent.train = False
 agent.start()
-agent.env.plot_trade_history("test1")
-agent.env.plot_observation_history("test2")
+x = agent.env.avg_pnls
+print(np.mean(x))
+print(np.std(x))
+print(len(x))
+#agent.env.plot_trade_history("test1")
+#agent.env.plot_observation_history("test2")
 
 
 '''

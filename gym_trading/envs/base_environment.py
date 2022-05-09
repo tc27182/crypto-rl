@@ -10,6 +10,7 @@ import gym_trading.utils.reward as reward_types
 from configurations import (
     EMA_ALPHA, INDICATOR_WINDOW, INDICATOR_WINDOW_MAX, MARKET_ORDER_FEE,
 )
+from gym_trading.utils import LimitOrder
 from gym_trading.utils.broker import Broker
 from gym_trading.utils.data_pipeline import DataPipeline
 from gym_trading.utils.plot_history import Visualize
@@ -80,7 +81,7 @@ class BaseEnvironment(Env, ABC):
         self.T = 5
         self.count = 0
         self.num_assets = 10
-
+        self.avg_pnls = []
         # properties required for instantiation
         self.symbol = symbol
         #self.action_repeats = action_repeats
@@ -424,6 +425,7 @@ class BaseEnvironment(Env, ABC):
         self.episode_stats.reset()
         self.rsi.reset()
         self.tns.reset()
+        self.avg_pnls.append(np.sum(self.viz.to_df()['realized_pnl']))
         self.viz.reset()
 
         for step in range(self.window_size + INDICATOR_WINDOW_MAX + 1):
@@ -448,7 +450,7 @@ class BaseEnvironment(Env, ABC):
 
         self.observation = self._get_observation()
 
-        env.broker.long_inventory.order = LimitOrder(ccy=self.symbol,
+        self.broker.long_inventory.order = LimitOrder(ccy=self.symbol,
                                 side='long',
                                 price=self.midpoint,
                                 step=self.local_step_number,
@@ -460,10 +462,10 @@ class BaseEnvironment(Env, ABC):
                         sell_volume=self.num_assets,
                         step=self.local_step_number)
         self.action_repeats = 1
-        self.env.step()
+        self.step()
         self.local_step_number -= 1
         self.action_repeats = self.H//self.T
-        self.env.broker.long_inventory.cancel_limit_order()
+        self.broker.long_inventory.cancel_limit_order()
 
 
         return self.observation
