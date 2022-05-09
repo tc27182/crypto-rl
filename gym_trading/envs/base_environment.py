@@ -77,11 +77,12 @@ class BaseEnvironment(Env, ABC):
 
         #new
         self.H = 300
-        self.T = 4
+        self.T = 5
 
         # properties required for instantiation
         self.symbol = symbol
-        self.action_repeats = action_repeats
+        #self.action_repeats = action_repeats
+        self.action_repeats = self.H//self.T
         self._seed = 0
         self._random_state = np.random.RandomState(seed=self._seed)
         self.training = training
@@ -262,14 +263,16 @@ class BaseEnvironment(Env, ABC):
 
         return reward
 
+    '''
     def step(self, action: int = 0) -> (np.ndarray, np.ndarray, bool, dict):
         while self.local_step_number % (self.H // self.T) != 0:
             self.fake_step()
             #print(self.local_step_number)
         return self.fake_step(action)
+    '''
 
     
-    def fake_step(self, action: int = 0) -> (np.ndarray, np.ndarray, bool, dict):
+    def step(self, action: int = 0) -> (np.ndarray, np.ndarray, bool, dict):
         """
         Step through environment with action.
 
@@ -279,7 +282,6 @@ class BaseEnvironment(Env, ABC):
         for current_step in range(self.action_repeats):
 
             if self.done:
-                print('episode finished!')
                 self.reset()
                 return self.observation, self.reward, self.done
 
@@ -381,12 +383,12 @@ class BaseEnvironment(Env, ABC):
         :return: (np.array) Observation at first step
         """
         if self.training:
-            self.local_step_number = self.seed()[0]*300
-            if self.seed()[0]*300 >= self._raw_data.shape[0] - self.action_repeats - 1:
-                self.seed = -1
-            self.seed(self._seed+1)
-            #self.local_step_number = self._random_state.randint(low=0,
-            #                                                    high=self.max_steps // 5)
+            #self.local_step_number = self.seed()[0]*300
+            #if self.seed()[0]*300 >= self._raw_data.shape[0] - self.action_repeats - 1:
+            #    self.seed = -1
+            #self.seed(self._seed+1)
+            self.local_step_number = self._random_state.randint(low=0,
+                                                                high=86000) #300 less than # of s in a day
         else:
             self.local_step_number = 0
 
