@@ -50,8 +50,8 @@ class Agent(object):
         self.number_of_training_steps = 1000
 
         # Create environment
-        self.env = env = MarketMaker(symbol="LTC-USD", fitting_file="archive/XBTUSD_2020-01-01.csv", testing_file="archive/XBTUSD_2020-01-02.csv")
-        self.env_name = self.env.env.id
+        self.env = MarketMaker(symbol="LTC-USD", fitting_file="archive/XBTUSD_2020-01-01.csv", testing_file="archive/XBTUSD_2020-01-01.csv")
+        self.env_name = self.env.id
 
         # Create agent
         # NOTE: 'Keras-RL' uses its own frame-stacker
@@ -59,7 +59,7 @@ class Agent(object):
         self.model = self.create_model(name=self.neural_network_type)
         self.memory = SequentialMemory(limit=10000,
                                        window_length=self.memory_frame_stack)
-        self.train = self.env.env.training
+        self.train = self.env.training
         self.cwd = os.path.dirname(os.path.realpath(__file__))
 
         # create the agent
@@ -163,6 +163,7 @@ class Agent(object):
                 checkpoint_weights_filename))
             log_filename = os.path.join(self.cwd, 'dqn_weights',
                                         'dqn_{}_log.json'.format(self.env_name))
+            print(log_filename)
             LOGGER.info('log_filename: {}'.format(log_filename))
 
             callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename,
@@ -182,4 +183,4 @@ class Agent(object):
             LOGGER.info("AGENT weights saved.")
         else:
             LOGGER.info('Starting TEST...')
-            self.agent.test(self.env, nb_episodes=2, visualize=self.visualize)
+            #self.agent.test(self.env, nb_episodes=2, visualize=self.visualize)

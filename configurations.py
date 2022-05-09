@@ -49,5 +49,7 @@ EMA_ALPHA = 0.99  # [0.9, 0.99, 0.999, 0.9999]
 ENCOURAGEMENT = 0.000000000001
 
 # Data Directory
-ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
+#ROOT_PATH = '~/crypto-rl/'
+ROOT_PATH = os.path.join(os.path.expanduser('~'), 'crypto-rl')
+#ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 DATA_PATH = os.path.join(ROOT_PATH, 'data_recorder', 'database', 'data_exports')

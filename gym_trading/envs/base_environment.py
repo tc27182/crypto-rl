@@ -30,7 +30,7 @@ class BaseEnvironment(Env, ABC):
                  max_position: int = 10,
                  window_size: int = 100,
                  seed: int = 1,
-                 action_repeats: int = 5,
+                 action_repeats: int = 1,
                  training: bool = True,
                  format_3d: bool = False,
                  reward_type: str = 'default',
@@ -74,6 +74,10 @@ class BaseEnvironment(Env, ABC):
 
         # get Broker class to keep track of PnL and orders
         self.broker = Broker(max_position=max_position, transaction_fee=transaction_fee)
+
+        #new
+        self.H = 300
+        self.T = 4
 
         # properties required for instantiation
         self.symbol = symbol
@@ -127,7 +131,7 @@ class BaseEnvironment(Env, ABC):
         self._best_asks = self._raw_data['midpoint'] + (self._raw_data['spread'] / 2)
 
         #self.max_steps = self._raw_data.shape[0] - self.action_repeats - 1
-        self.max_steps = 300
+        self.max_steps = 3000
 
         # load indicators into the indicator manager
         self.tns = IndicatorManager()
@@ -259,6 +263,13 @@ class BaseEnvironment(Env, ABC):
         return reward
 
     def step(self, action: int = 0) -> (np.ndarray, np.ndarray, bool, dict):
+        while self.local_step_number % (self.H // self.T) != 0:
+            self.fake_step()
+            #print(self.local_step_number)
+        return self.fake_step(action)
+
+    
+    def fake_step(self, action: int = 0) -> (np.ndarray, np.ndarray, bool, dict):
         """
         Step through environment with action.
 
@@ -268,6 +279,7 @@ class BaseEnvironment(Env, ABC):
         for current_step in range(self.action_repeats):
 
             if self.done:
+                print('episode finished!')
                 self.reset()
                 return self.observation, self.reward, self.done
 
@@ -369,10 +381,10 @@ class BaseEnvironment(Env, ABC):
         :return: (np.array) Observation at first step
         """
         if self.training:
-            self.local_step_number = self.seed*300
-            if self.seed*300 >= self._raw_data.shape[0] - self.action_repeats - 1:
+            self.local_step_number = self.seed()[0]*300
+            if self.seed()[0]*300 >= self._raw_data.shape[0] - self.action_repeats - 1:
                 self.seed = -1
-            self.seed += 1
+            self.seed(self._seed+1)
             #self.local_step_number = self._random_state.randint(low=0,
             #                                                    high=self.max_steps // 5)
         else:
