@@ -2,8 +2,18 @@ from gym_trading.envs import MarketMaker
 from gym_trading.utils import LimitOrder
 from agent_new.qn import Agent
 
-agent = Agent()
-agent.start()
+for day in range (31,32,1):
+    print("THE DAY IS NOW" + str(day))
+    if day < 10:
+        data = "0" + str(day)
+    else:
+        data = str(day)
+    fitting_file = "January/January/XBTUSD_2020-01-" + data + ".csv"
+    if day != 14:
+        agent = Agent(number_of_training_steps = 301, fitting_file = fitting_file, testing_file = fitting_file, action_repeats = 300)
+        agent.start()
+agent.env.plot_trade_history("test1.png")
+agent.env.plot_observation_history("test2.png")
 
 
 '''

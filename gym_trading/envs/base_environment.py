@@ -78,6 +78,7 @@ class BaseEnvironment(Env, ABC):
         #new
         self.H = 300
         self.T = 5
+        self.count = 0
 
         # properties required for instantiation
         self.symbol = symbol
@@ -132,7 +133,7 @@ class BaseEnvironment(Env, ABC):
         self._best_asks = self._raw_data['midpoint'] + (self._raw_data['spread'] / 2)
 
         #self.max_steps = self._raw_data.shape[0] - self.action_repeats - 1
-        self.max_steps = 3000
+        self.max_steps = 300
 
         # load indicators into the indicator manager
         self.tns = IndicatorManager()
@@ -347,11 +348,13 @@ class BaseEnvironment(Env, ABC):
 
             self.reward += self.step_reward
             self.local_step_number += 1
+            self.count += 1
             self.last_midpoint = self.midpoint
 
         self.observation = self._get_observation()
 
-        if self.local_step_number > self.max_steps:
+        if self.count >= self.H:
+        #if self.local_step_number > self.max_steps:
             self.done = True
 
             had_long_positions = 1 if self.broker.long_inventory_count > 0 else 0
@@ -387,8 +390,8 @@ class BaseEnvironment(Env, ABC):
             #if self.seed()[0]*300 >= self._raw_data.shape[0] - self.action_repeats - 1:
             #    self.seed = -1
             #self.seed(self._seed+1)
-            self.local_step_number = self._random_state.randint(low=0,
-                                                                high=86000) #300 less than # of s in a day
+            self.count = 1
+            self.local_step_number = self._random_state.randint(low=0, high=self._raw_data.shape[0] - self.H - 1) #300 less than # of s in a day
         else:
             self.local_step_number = 0
 

@@ -16,7 +16,7 @@ import gym_trading
 class Agent(object):
     name = 'DQN'
 
-    def __init__(self, number_of_training_steps=1e5, gamma=0.999, load_weights=False,
+    def __init__(self, fitting_file, testing_file, number_of_training_steps=1e5, gamma=0.999, load_weights=False,
                  visualize=False, dueling_network=True, double_dqn=True, nn_type='mlp',
                  **kwargs):
         """
@@ -47,10 +47,11 @@ class Agent(object):
         
         #new
         self.double_dqn = False
-        self.number_of_training_steps = 1000
+        self.fitting_file = fitting_file
+        self.testing_file = testing_file
 
         # Create environment
-        self.env = MarketMaker(symbol="LTC-USD", fitting_file="archive/XBTUSD_2020-01-01.csv", testing_file="archive/XBTUSD_2020-01-01.csv")
+        self.env = MarketMaker(symbol="LTC-USD", fitting_file=self.fitting_file, testing_file = self.testing_file)
         self.env_name = self.env.id
 
         # Create agent
