@@ -356,7 +356,7 @@ class BaseEnvironment(Env, ABC):
         if self.count >= self.H:
         #if self.local_step_number > self.max_steps:
             self.done = True
-
+            print("DINE")
             had_long_positions = 1 if self.broker.long_inventory_count > 0 else 0
             had_short_positions = 1 if self.broker.short_inventory_count > 0 else 0
 
