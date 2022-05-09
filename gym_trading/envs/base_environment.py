@@ -391,7 +391,7 @@ class BaseEnvironment(Env, ABC):
             #    self.seed = -1
             #self.seed(self._seed+1)
             self.count = 1
-            self.local_step_number = self._random_state.randint(low=0, high=self._raw_data.shape[0] - self.H - 1) #300 less than # of s in a day
+            self.local_step_number = self._random_state.randint(low=0, high=self._raw_data.shape[0] - self.H - self.window_size - INDICATOR_WINDOW_MAX - 2) #300 less than # of s in a day
         else:
             self.local_step_number = 0
 

@@ -184,4 +184,4 @@ class Agent(object):
             LOGGER.info("AGENT weights saved.")
         else:
             LOGGER.info('Starting TEST...')
-            #self.agent.test(self.env, nb_episodes=2, visualize=self.visualize)
+            self.agent.test(self.env, nb_episodes=1, visualize=self.visualize)
